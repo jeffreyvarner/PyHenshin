@@ -32,6 +32,13 @@ class MyPyHenshinIntermediateModelObject(object):
             # Get the reaction dictionary for this reaction name -
             reaction_component_array = model_dictionary[reaction_name]
 
+
+
+        for reaction_name in reaction_name_array:
+
+            # Get the reaction dictionary for this reaction name -
+            reaction_component_array = model_dictionary[reaction_name]
+
             # reactant string -
             reactant_string = reaction_component_array[1]
             reactant_species_list = self.extractSpeciesFromVLVFFReactionString(reactant_string)
