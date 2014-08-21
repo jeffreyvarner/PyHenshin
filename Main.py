@@ -34,11 +34,9 @@ def main(argv):
         model_input_parser = MyPyHenshinVLNLFFParser()
 
     else:
-        print "Unsupported input file type"
-        exit(-1)
+        raise Exception("Unsupported input file type")
 
     # Next, we need to build the transformation manager -
-    output_language_type_flag = transformation_dictionary.get("transformation_output_language_type")
     model_type_flag = transformation_dictionary.get("transformation_model_class")
     if model_type_flag == "MA":
         model_transformation_manager = MyPyHenshinMAModelTransformation()
@@ -50,8 +48,14 @@ def main(argv):
         model_transformation_manager = MyPyHenshinHCFLModelTransformation()
 
     else:
-        print "Unsupported model type"
-        exit(-1)
+        raise Exception("Unsupported model type")
+
+
+    # Check language type -
+    output_language_type_flag = transformation_dictionary.get("transformation_output_language_type")
+    if output_language_type_flag not in ['Octave-M', 'Octave-C', 'Matlab-M', 'Python', 'GSL-C', 'Sundials-C']:
+        error_string = output_language_type_flag+" is an unsupported language type"
+        raise Exception(error_string)
 
     # execute the parser -
     input_file_url = transformation_dictionary['transformation_input_url']
@@ -60,7 +64,11 @@ def main(argv):
     pdb.set_trace()
 
     # hand the model tree to the transformation manager -
-    model_componenent_dictionary = model_transformation_manager.executeTransformationUsingIntermediateTree(transformation_dictionary,intermediate_model_tree, input_language_flag, model_type_flag,output_language_type_flag)
+    model_componenent_dictionary = model_transformation_manager.executeTransformationUsingIntermediateTree(transformation_dictionary,
+                                                                                                           intermediate_model_tree,
+                                                                                                           input_language_flag,
+                                                                                                           model_type_flag,
+                                                                                                           output_language_type_flag)
 
     # write the model components to disk -
     path_to_model_components = args_list.transformation_output_path
