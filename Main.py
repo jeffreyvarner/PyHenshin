@@ -18,6 +18,11 @@ def main(argv):
     arg_parser.add_argument('-o', '--transformation-output-path', type=str, required=True, help='Path to model output files')
     args_list = arg_parser.parse_args(argv[1:])
 
+    path_to_json_file = '/Users/jeffreyvarner/python_work/PyHenshin/conf/Rules.json'
+    json_data = open(path_to_json_file)
+    data = json.load(json_data)
+    json_data.close()
+
     # Ok, so we need to process the input file -
     input_file_path = args_list.transformation_input_path
     transformation_dictionary = processHenshinTransformationInputFileAtPath(input_file_path)
@@ -39,7 +44,7 @@ def main(argv):
     # Next, we need to build the transformation manager -
     model_type_flag = transformation_dictionary.get("transformation_model_class")
     if model_type_flag == "MA":
-        model_transformation_manager = MyPyHenshinMAModelTransformation()
+        model_transformation_manager = MyPyHenshinMAModelTransformation(data)
 
     elif model_type_flag == "FBA":
         model_transformation_manager = MyPyHenshinFBAModelTransformation()
@@ -61,8 +66,6 @@ def main(argv):
     input_file_url = transformation_dictionary['transformation_input_url']
     intermediate_model_tree = model_input_parser.buildModelTreeFromInputURL(input_file_url)
 
-    pdb.set_trace()
-
     # hand the model tree to the transformation manager -
     model_componenent_dictionary = model_transformation_manager.executeTransformationUsingIntermediateTree(transformation_dictionary,
                                                                                                            intermediate_model_tree,
@@ -76,7 +79,17 @@ def main(argv):
 
 
 def writeModelComponentsToDiskAtPath(path_to_model_components, model_component_dictionary):
-    pass
+
+    # We have a dictionary of model components, each is a seperate file.
+    # iterate through, write to disk -
+    for filename in model_component_dictionary.keys():
+        text_block = model_component_dictionary[filename]
+
+        # Construct the path -
+        final_path_string = path_to_model_components+filename
+        file = open(final_path_string, "w")
+        file.writelines(text_block)
+        file.close()
 
 def processHenshinTransformationInputFileAtPath(path_to_input_file):
 
