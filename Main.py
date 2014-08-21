@@ -63,7 +63,7 @@ def main(argv):
     model_componenent_dictionary = model_transformation_manager.executeTransformationUsingIntermediateTree(transformation_dictionary,intermediate_model_tree, input_language_flag, model_type_flag,output_language_type_flag)
 
     # write the model components to disk -
-    path_to_model_components = args_list.model_output_path
+    path_to_model_components = args_list.transformation_output_path
     writeModelComponentsToDiskAtPath(path_to_model_components, model_componenent_dictionary)
 
 
