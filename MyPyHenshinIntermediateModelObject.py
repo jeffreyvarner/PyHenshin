@@ -3,11 +3,11 @@ import pdb
 class MyPyHenshinIntermediateModelObject(object):
 
     def __init__(self):
-        self._myListOfSpeciesModels = None
+        self._myDictionaryOfSpeciesModels = None
         self._myDictionaryOfInteractionModels = None
 
     def __del__(self):
-        self._myListOfSpeciesModels = None
+        self._myDictionaryOfSpeciesModels = None
         self._myDictionaryOfInteractionModels = None
 
     def extractSpeciesFromVLVFFReactionString(self, reaction_string, direction_factor):
@@ -54,11 +54,25 @@ class MyPyHenshinIntermediateModelObject(object):
             reaction_model = dict(reactant_stoichiometric_dictionary.items()+product_stoichiometric_dictionary.items())
             self.addInteractionToInteractionDictionary(reaction_name, reaction_model)
 
+            reactant_model = {}
             for symbol in reactant_species_list:
-                self.addSpeciesSymbolToSpeciesList(symbol)
+                local_species_model = {}
+                local_species_model['symbol'] = symbol
+                local_species_model['compartment'] = 'model'
 
+                reactant_model[symbol] = local_species_model
+
+            product_model = {}
             for symbol in product_species_list:
-                self.addSpeciesSymbolToSpeciesList(symbol)
+                local_species_model = {}
+                local_species_model['symbol'] = symbol
+                local_species_model['compartment'] = 'model'
+
+                product_model[symbol] = local_species_model
+
+            species_model = dict(reactant_model.items()+product_model.items())
+            for (key, value) in species_model.iteritems():
+                self.addSpeciesSymbolToSpeciesDictionary(key, value)
 
 
     def addInteractionToInteractionDictionary(self, interaction_key, interaction_model):
@@ -69,14 +83,14 @@ class MyPyHenshinIntermediateModelObject(object):
         self._myDictionaryOfInteractionModels[interaction_key] = interaction_model
 
 
-    def addSpeciesSymbolToSpeciesList(self, species_model):
+    def addSpeciesSymbolToSpeciesDictionary(self, species_key, species_model):
 
-        if self._myListOfSpeciesModels is None:
-            self._myListOfSpeciesModels = []
+        if self._myDictionaryOfSpeciesModels is None:
+            self._myDictionaryOfSpeciesModels = {}
 
-        if species_model not in self._myListOfSpeciesModels:
-            if not species_model == '[]':
-                self._myListOfSpeciesModels.append(species_model)
+        if species_key not in self._myDictionaryOfSpeciesModels:
+            if not species_key == '[]':
+                self._myDictionaryOfSpeciesModels[species_key] = species_model
 
 
     @property
@@ -88,9 +102,9 @@ class MyPyHenshinIntermediateModelObject(object):
         self._myDictionaryOfInteractionModels = interaction_list
 
     @property
-    def myListOfSpeciesModels(self):
-        return self._myListOfSpeciesModels
+    def myDictionaryOfSpeciesModels(self):
+        return self._myDictionaryOfSpeciesModels
 
-    @myListOfSpeciesModels.setter
-    def myListOfSpeciesModels(self, species_list):
-        self._myListOfSpeciesModels = species_list
+    @myDictionaryOfSpeciesModels.setter
+    def myDictionaryOfSpeciesModels(self, species_list):
+        self._myDictionaryOfSpeciesModels = species_list
