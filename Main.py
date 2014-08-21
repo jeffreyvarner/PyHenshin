@@ -38,7 +38,7 @@ def main(argv):
         exit(-1)
 
     # Next, we need to build the transformation manager -
-    language_type_flag = transformation_dictionary.get("transformation_output_language_type")
+    output_language_type_flag = transformation_dictionary.get("transformation_output_language_type")
     model_type_flag = transformation_dictionary.get("transformation_model_class")
     if model_type_flag == "MA":
         model_transformation_manager = MyPyHenshinMAModelTransformation()
@@ -60,7 +60,7 @@ def main(argv):
     pdb.set_trace()
 
     # hand the model tree to the transformation manager -
-    model_componenent_dictionary = model_transformation_manager.executeTransformationUsingIntermediateTree(intermediate_model_tree)
+    model_componenent_dictionary = model_transformation_manager.executeTransformationUsingIntermediateTree(transformation_dictionary,intermediate_model_tree, input_language_flag, model_type_flag,output_language_type_flag)
 
     # write the model components to disk -
     path_to_model_components = args_list.model_output_path
@@ -98,7 +98,7 @@ def processHenshinTransformationInputFileAtPath(path_to_input_file):
         for (key, value) in local_dictionary.iteritems():
             temp_dictionary[key] = value
 
-    transformation_block.append(temp_dictionary)
+        transformation_block.append(temp_dictionary)
 
     # Store the block -
     transformation_dictionary['transformation_component_array'] = transformation_block
