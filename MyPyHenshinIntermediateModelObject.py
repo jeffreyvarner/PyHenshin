@@ -3,14 +3,18 @@ import pdb
 class MyPyHenshinIntermediateModelObject(object):
 
     def __init__(self):
+        self._myInteractionNameList = []
+        self._mySpeciesSymbolList = None
         self._myDictionaryOfSpeciesModels = None
         self._myDictionaryOfInteractionModels = None
 
     def __del__(self):
+        self._myInteractionNameList = None
+        self._mySpeciesSymbolList = None
         self._myDictionaryOfSpeciesModels = None
         self._myDictionaryOfInteractionModels = None
 
-    def extractSpeciesFromVLVFFReactionString(self, reaction_string, direction_factor):
+    def __extractSpeciesFromVLVFFReactionString(self, reaction_string, direction_factor):
 
         # Split around the +
         species_list = reaction_string.split('+')
@@ -36,19 +40,54 @@ class MyPyHenshinIntermediateModelObject(object):
 
     def initilizeMyIntermediateModelObjectWithVLFFModelDictionary(self, model_dictionary):
 
+        # Iterate through reactions in natural order, before we do anything split the reversible steps -
         reaction_name_array = model_dictionary['reaction_name_array']
+        local_reaction_name_array = []
         for reaction_name in reaction_name_array:
 
             # Get the reaction dictionary for this reaction name -
-            reaction_component_array = model_dictionary[reaction_name]
+            reaction_component_dictionary = model_dictionary[reaction_name]
+
+            # Is this reaction reversible?
+            reversible_flag = reaction_component_dictionary['reaction_backward_flag']
+            if reversible_flag == '-inf':
+                # We have a reversible reaction .. need to split into two -
+
+                # Update the names -
+                reverse_name = reaction_name+'_reverse'
+                local_reaction_name_array.append(reaction_name)
+                local_reaction_name_array.append(reverse_name)
+
+                # Create a new dictionary -
+                reverse_reaction_component_dictionary = {}
+                reverse_reaction_component_dictionary['reaction_name'] = reverse_name
+                reverse_reaction_component_dictionary['reaction_left_side'] = reaction_component_dictionary['reaction_right_side']
+                reverse_reaction_component_dictionary['reaction_right_side'] = reaction_component_dictionary['reaction_left_side']
+                reverse_reaction_component_dictionary['reaction_backward_flag'] = '0'
+                reverse_reaction_component_dictionary['reaction_forward_flag'] = reaction_component_dictionary['reaction_forward_flag']
+
+                # update the original reaction -
+                reaction_component_dictionary['reaction_backward_flag'] = '0'
+
+                model_dictionary[reverse_name] = reverse_reaction_component_dictionary
+            else:
+                local_reaction_name_array.append(reaction_name)
+
+
+        # Grad this order for later -
+        self.myInteractionNameList = local_reaction_name_array
+        for reaction_name in local_reaction_name_array:
+
+            # Get the reaction dictionary for this reaction name -
+            reaction_component_dictionary = model_dictionary[reaction_name]
 
             # reactant string -
-            reactant_string = reaction_component_array[1]
-            (reactant_species_list, reactant_stoichiometric_dictionary) = self.extractSpeciesFromVLVFFReactionString(reactant_string, -1.0)
+            reactant_string = reaction_component_dictionary['reaction_left_side']
+            (reactant_species_list, reactant_stoichiometric_dictionary) = self.__extractSpeciesFromVLVFFReactionString(reactant_string, -1.0)
 
             # product string -
-            product_string = reaction_component_array[2]
-            (product_species_list, product_stoichiometric_dictionary) = self.extractSpeciesFromVLVFFReactionString(product_string, 1.0)
+            product_string = reaction_component_dictionary['reaction_right_side']
+            (product_species_list, product_stoichiometric_dictionary) = self.__extractSpeciesFromVLVFFReactionString(product_string, 1.0)
 
             # build reaction model -
             reaction_model = dict(reactant_stoichiometric_dictionary.items()+product_stoichiometric_dictionary.items())
@@ -59,21 +98,31 @@ class MyPyHenshinIntermediateModelObject(object):
                 local_species_model = {}
                 local_species_model['symbol'] = symbol
                 local_species_model['compartment'] = 'model'
-
                 reactant_model[symbol] = local_species_model
+
+                self.addSpeciesSymbolToSpeciesSymbolList(symbol)
 
             product_model = {}
             for symbol in product_species_list:
                 local_species_model = {}
                 local_species_model['symbol'] = symbol
                 local_species_model['compartment'] = 'model'
-
                 product_model[symbol] = local_species_model
+
+                self.addSpeciesSymbolToSpeciesSymbolList(symbol)
 
             species_model = dict(reactant_model.items()+product_model.items())
             for (key, value) in species_model.iteritems():
                 self.addSpeciesSymbolToSpeciesDictionary(key, value)
 
+
+    def addSpeciesSymbolToSpeciesSymbolList(self,species_symbol):
+
+        if self._mySpeciesSymbolList is None:
+            self._mySpeciesSymbolList = []
+
+        if species_symbol not in self._mySpeciesSymbolList:
+            self._mySpeciesSymbolList.append(species_symbol)
 
     def addInteractionToInteractionDictionary(self, interaction_key, interaction_model):
 
@@ -92,6 +141,24 @@ class MyPyHenshinIntermediateModelObject(object):
             if not species_key == '[]':
                 self._myDictionaryOfSpeciesModels[species_key] = species_model
 
+
+
+    @property
+    def myInteractionNamelList(self):
+        return self._myInteractionNameList
+
+
+    @myInteractionNamelList.setter
+    def myInteractionNameList(self,interaction_name_list):
+        self._myInteractionNameList = interaction_name_list
+
+    @property
+    def mySpeciesSymbolList(self):
+        return self._mySpeciesSymbolList
+
+    @mySpeciesSymbolList.setter
+    def mySpeciesSymbolList(self,species_list):
+        self._mySpeciesSymbolList = species_list
 
     @property
     def myDictionaryOfInteractionModels(self):

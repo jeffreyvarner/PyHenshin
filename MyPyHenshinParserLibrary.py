@@ -57,13 +57,13 @@ class MyPyHenshinVLFFParser(MyPyHenshinAbstractParser):
                     reaction_name_array.append(reaction_name)
 
                     # build a reaction dictionary -
-                    local_array = []
-                    local_array.append(reaction_name)
-                    local_array.append(reaction_left_side)
-                    local_array.append(reaction_right_side)
-                    local_array.append(reaction_backward_flag)
-                    local_array.append(reaction_forward_flag)
-                    reaction_dictionary[reaction_name] = local_array
+                    local_dictionary = {}
+                    local_dictionary['reaction_name'] = reaction_name
+                    local_dictionary['reaction_left_side'] = reaction_left_side
+                    local_dictionary['reaction_right_side'] = reaction_right_side
+                    local_dictionary['reaction_backward_flag'] = reaction_backward_flag
+                    local_dictionary['reaction_forward_flag'] = reaction_forward_flag
+                    reaction_dictionary[reaction_name] = local_dictionary
 
         input_text_file.close()
         reaction_dictionary['reaction_name_array'] = reaction_name_array
