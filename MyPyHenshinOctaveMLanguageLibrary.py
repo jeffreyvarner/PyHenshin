@@ -1,5 +1,5 @@
 import pdb
-
+import numpy
 
 class MyPyHenshinOctaveMLanguageLibrary(object):
 
@@ -24,6 +24,20 @@ class MyPyHenshinOctaveMLanguageLibrary(object):
             species_symbol_list = model_tree.mySpeciesSymbolList
             interaction_name_list = model_tree.myInteractionNameList
 
+            # Create stochiometric array -
+            number_of_species = len(species_symbol_list)
+            number_of_reactions = len(interaction_name_list)
+            stmatrix = numpy.empty((number_of_species,number_of_reactions))
+            for reaction_index in range(0,number_of_reactions):
+
+                local_reaction_name = interaction_name_list[reaction_index]
+
+                for species_index in range(0,number_of_species):
+
+                    local_species_symbol = species_symbol_list[species_index]
+                    stmatrix[species_index, reaction_index] = 0.0
+
+            return stmatrix
 
         else:
 
