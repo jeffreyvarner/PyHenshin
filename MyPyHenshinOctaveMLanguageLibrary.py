@@ -27,17 +27,30 @@ class MyPyHenshinOctaveMLanguageLibrary(object):
             # Create stochiometric array -
             number_of_species = len(species_symbol_list)
             number_of_reactions = len(interaction_name_list)
-            stmatrix = numpy.empty((number_of_species,number_of_reactions))
-            for reaction_index in range(0,number_of_reactions):
+            stmatrix_buffer = ''
+            for species_index in range(0, number_of_species):
 
-                local_reaction_name = interaction_name_list[reaction_index]
+                local_species_symbol = species_symbol_list[species_index]
 
-                for species_index in range(0,number_of_species):
+                stmatrix_row = ""
+                for reaction_index in range(0, number_of_reactions):
 
-                    local_species_symbol = species_symbol_list[species_index]
-                    stmatrix[species_index, reaction_index] = 0.0
+                    # get the reaction name -
+                    local_reaction_name = interaction_name_list[reaction_index]
 
-            return stmatrix
+                    # look up reaction_stoichiometric_map
+                    reaction_stoichiometric_map = model_tree.myDictionaryOfInteractionModels[local_reaction_name]
+
+                    if local_species_symbol in reaction_stoichiometric_map:
+                        value = reaction_stoichiometric_map[local_species_symbol]
+                        stmatrix_row += " "+str(value)+" "
+                    else:
+                        stmatrix_row += " 0.0 "
+
+                stmatrix_buffer += stmatrix_row + "\n"
+
+            pdb.set_trace()
+            return stmatrix_buffer
 
         else:
 
