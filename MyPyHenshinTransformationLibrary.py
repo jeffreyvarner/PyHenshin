@@ -1,5 +1,6 @@
 from MyPyHenshinAbstractTransformation import MyPyHenshinAbstractTransformation
 from MyPyHenshinOctaveMLanguageLibrary import MyPyHenshinOctaveMLanguageLibrary
+from MyPyHenshinOctaveCLanguageLibrary import MyPyHenshinOctaveCLanguageLibrary
 import pdb
 
 class MyPyHenshinMAModelTransformation(MyPyHenshinAbstractTransformation):
@@ -32,6 +33,17 @@ class MyPyHenshinMAModelTransformation(MyPyHenshinAbstractTransformation):
                         # lookup the correct library -
                         if output_language_type_flag == 'Octave-M':
                             library_instance = MyPyHenshinOctaveMLanguageLibrary()
+                            method = getattr(library_instance, method_name)
+
+                            if not method:
+                                raise Exception("Method %s not implemented" % method_name)
+
+                            # Execute method -
+                            program_buffer = method(key_value, transformation_tree, model_tree)
+                            program_dictionary[file_name] = program_buffer
+
+                        elif output_language_type_flag == 'Octave-C':
+                            library_instance = MyPyHenshinOctaveCLanguageLibrary()
                             method = getattr(library_instance, method_name)
 
                             if not method:
