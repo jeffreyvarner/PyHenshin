@@ -126,10 +126,12 @@ class MyPyHenshinOctaveMLanguageLibrary(object):
             buffer += '];\n'
             buffer += '\n'
             buffer += '% == DO NOT EDIT BELOW THIS LINE ================================== \n'
+            buffer += 'DF.STOICHIOMETRIC_MATRIX = stoichiometric_matrix;\n'
             buffer += 'DF.NUMBER_OF_REACTIONS = number_of_reactions;\n'
-            buffer += 'DF.NUMBER_OF_SPECIES = number_of_species;\n'
+            buffer += 'DF.NUMBER_OF_STATES = number_of_species;\n'
             buffer += 'DF.KINETIC_PARAMETER_VECTOR = KPV;\n'
             buffer += 'DF.INITIAL_CONDITION_VECTOR = ICV;\n'
+            buffer += 'DF.MEASUREMENT_SELECTION_VECTOR = 1:number_of_species;\n'
             buffer += '% ================================================================= \n'
             buffer += 'return;\n'
 
@@ -207,10 +209,39 @@ class MyPyHenshinOctaveMLanguageLibrary(object):
 
             # Get the file name (we need this to get the function name -
             filename = component_dictionary['file_name']
-            print filename
+
+            # Initialize an empty buffer -
+            buffer = ''
+
+            # Get the function name -
+            function_name = filename.split('.')[0]
+            buffer += 'function [TSIM,X,OUTPUT] = '+str(function_name)+'(pDataFile,TSTART,TSTOP,Ts,DFIN)\n'
+            buffer += '\n'
+            buffer += '% Check to see if I need to load the datafile \n'
+            buffer += 'if (~isempty(DFIN))\n'
+            buffer += '\tDF = DFIN;\n'
+            buffer += 'else\n'
+            buffer += '\tDF = feval(pDataFile,TSTART,TSTOP,Ts,[]);\n'
+            buffer += 'end;\n'
+            buffer += '\n'
+            buffer += '% Get reqd stuff from data struct - \n'
+            buffer += 'IC = DF.INITIAL_CONDITION_VECTOR;\n'
+            buffer += 'TSIM = TSTART:Ts:TSTOP;\n'
+            buffer += 'MEASUREMENT_INDEX_VECTOR = DF.MEASUREMENT_SELECTION_VECTOR;\n'
+            buffer += '\n'
+            buffer += '% Call the ODE solver - the default is ODE15s\n'
+            buffer += 'pMassBalances = @(x,t)BalanceEquations(x,t,DF);\n'
+            buffer += 'X = lsode(pMassBalances,IC,TSIM);\n'
+            buffer += '\n'
+            buffer += '% Calculate the output - \n'
+            buffer += 'OUTPUT = X(:,MEASUREMENT_INDEX_VECTOR);\n'
+            buffer += '\n'
+            buffer += '% return to caller -\n'
+            buffer += 'return;\n'
+
+            return buffer
 
         else:
-
             raise Exception("Error while executing "+str(__name__)+". Missing transformation component dictionary?")
 
         return "Code stuff goes here ..."
@@ -240,6 +271,9 @@ class MyPyHenshinOctaveMLanguageLibrary(object):
 
             # Fill the buffer ...
             buffer += 'function rV = '+function_name+'(t,x,DF)\n'
+            buffer += '\n'
+            buffer += '% Get the parameter vector - \n'
+            buffer += 'kV = DF.KINETIC_PARAMETER_VECTOR;\n'
             buffer += '\n'
             buffer += '% Alias the species for debugging - \n'
 
