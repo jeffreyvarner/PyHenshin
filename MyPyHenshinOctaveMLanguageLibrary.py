@@ -131,6 +131,7 @@ class MyPyHenshinOctaveMLanguageLibrary(object):
             buffer += 'DF.KINETIC_PARAMETER_VECTOR = KPV;\n'
             buffer += 'DF.INITIAL_CONDITION_VECTOR = ICV;\n'
             buffer += '% ================================================================= \n'
+            buffer += 'return;\n'
 
             return buffer
         else:
@@ -156,7 +157,31 @@ class MyPyHenshinOctaveMLanguageLibrary(object):
 
             # Get the file name (we need this to get the function name -
             filename = component_dictionary['file_name']
-            print filename
+
+            # Initialize an empty buffer -
+            buffer = ''
+
+            # Get the function name -
+            function_name = filename.split('.')[0]
+
+            # Fill the buffer ...
+            buffer += 'function dxdt = '+function_name+'(x,t,DF)\n'
+            buffer += '\n'
+            buffer += '% Get the stoichiometric matrix -\n'
+            buffer += 'STM = DF.STOICHIOMETRIC_MATRIX;\n'
+            buffer += '\n'
+            buffer += '% Calculate the kinetics -\n'
+            buffer += 'rV = Kinetics(t,x,DF);\n'
+            buffer += '\n'
+            buffer += '% Calculate the inputs -\n'
+            buffer += 'uV = Input(t,x,DF);\n'
+            buffer += '\n'
+            buffer += '% Calculate the dxdt terms -\n'
+            buffer += 'dxdt = STM*rV + uV;\n'
+            buffer += '\n'
+            buffer += 'return;\n'
+
+            return buffer
 
         else:
 
@@ -206,7 +231,50 @@ class MyPyHenshinOctaveMLanguageLibrary(object):
 
             # Get the file name (we need this to get the function name -
             filename = component_dictionary['file_name']
-            print filename
+
+            # Initialize an empty buffer -
+            buffer = ''
+
+            # Get the function name -
+            function_name = filename.split('.')[0]
+
+            # Fill the buffer ...
+            buffer += 'function rV = '+function_name+'(t,x,DF)\n'
+            buffer += '\n'
+            buffer += '% Alias the species for debugging - \n'
+
+            species_symbol_list = model_tree.mySpeciesSymbolList
+            species_counter = 1
+            for species_symbol in species_symbol_list:
+
+                if not species_symbol == '[]':
+                    buffer += species_symbol + ' = x('+str(species_counter)+',1);\n'
+                    species_counter += 1
+
+            buffer += '\n'
+            buffer += '% Calculate the rate vector - \n'
+            interaction_name_list = model_tree.myInteractionNameList
+            reaction_counter = 1
+            for local_reaction_name in interaction_name_list:
+
+                buffer += 'rV('+str(reaction_counter)+',1) = kV('+str(reaction_counter)+',1)'
+
+                # look up reaction_stoichiometric_map
+                reaction_stoichiometric_map = model_tree.myDictionaryOfInteractionModels[local_reaction_name]
+                for (local_species_symbol,stcoeff) in reaction_stoichiometric_map.iteritems():
+
+                    if not local_species_symbol == 'raw_interaction_string' and not local_species_symbol == '[]':
+                        if float(stcoeff)<0.0:
+                            buffer += '*(('+local_species_symbol+')^'+str(-1*stcoeff)+')'
+
+
+                buffer += ';\n'
+                reaction_counter += 1
+
+            buffer += '\n'
+            buffer += 'return;\n'
+
+            return buffer
 
         else:
 
@@ -230,10 +298,14 @@ class MyPyHenshinOctaveMLanguageLibrary(object):
 
             # Get the file name (we need this to get the function name -
             filename = component_dictionary['file_name']
+
+            # Initialize an empty buffer -
             buffer = ''
 
             # Get the function name -
             function_name = filename.split('.')[0]
+
+            # Fill the buffer ...
             buffer += 'function uV = '+function_name+'(t,x,DF)\n'
             buffer += '\n'
             buffer += '% Get the number of states - \n'
