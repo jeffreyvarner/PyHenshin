@@ -27,7 +27,7 @@ class MyPyHenshinIntermediateModelObject(object):
                 new_species_list.append(species_symbol)
 
                 # grab the stoichoimetry -
-                stoichiometry_dictionary[species_symbol] = direction_factor*raw_species.split('*')[0]
+                stoichiometry_dictionary[species_symbol] = direction_factor*float(raw_species.split('*')[0])
 
             else:
                 new_species_list.append(raw_species)

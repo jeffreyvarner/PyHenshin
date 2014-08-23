@@ -73,7 +73,40 @@ class MyPyHenshinOctaveCLanguageLibrary(object):
             buffer += '// Kinetics function - \n'
             buffer += 'void calculateKinetics(ColumnVector& kV,ColumnVector& x,ColumnVector& rV)\n'
             buffer += '{\n'
-            buffer += '\t // Add inputs code here...\n'
+            buffer += '\t// Alias the species for debugging - \n'
+
+            species_symbol_list = model_tree.mySpeciesSymbolList
+            species_counter = 0
+            for species_symbol in species_symbol_list:
+
+                if not species_symbol == '[]':
+                    buffer += '\tfloat '+species_symbol + ' = x('+str(species_counter)+',0);\n'
+                    species_counter += 1
+
+            buffer += '\n'
+            buffer +'\t// Calculate the rate vector - \n'
+            interaction_name_list = model_tree.myInteractionNameList
+            reaction_counter = 0
+            for local_reaction_name in interaction_name_list:
+
+                buffer += '\trV('+str(reaction_counter)+',0) = kV('+str(reaction_counter)+',0)'
+
+                # look up reaction_stoichiometric_map
+                reaction_stoichiometric_map = model_tree.myDictionaryOfInteractionModels[local_reaction_name]
+                for (local_species_symbol,stcoeff) in reaction_stoichiometric_map.iteritems():
+
+                    if not local_species_symbol == 'raw_interaction_string' and not local_species_symbol == '[]':
+                        if float(stcoeff)<0.0:
+
+                            if float(stcoeff) == -1.0:
+                                buffer += '*('+local_species_symbol+')'
+                            else:
+                                buffer += '*pow('+local_species_symbol+','+str(-1*stcoeff)+')'
+
+                buffer += ';\n'
+                reaction_counter += 1
+
+            buffer += '\n'
             buffer += '}\n'
             buffer += '\n'
             buffer += '// Balance equations function - \n'
