@@ -110,8 +110,9 @@ class MyPyHenshinOctaveCLanguageLibrary(object):
             buffer += '}\n'
             buffer += '\n'
             buffer += '// Balance equations function - \n'
-            buffer += 'void calculateMassBalances(int NSTATES,Matrix& STMATRIX,ColumnVector& rV,ColumnVector& ds,ColumnVector& dx)\n'
+            buffer += 'void calculateMassBalances(int NSTATES,Matrix& STMATRIX,ColumnVector& rV,ColumnVector& uV,ColumnVector& dx)\n'
             buffer += '{\n'
+            buffer += '\tdx = STMATRIX*rV + uV;\n'
             buffer += '}\n'
 
             return buffer
