@@ -1,0 +1,50 @@
+{
+	"list_of_transformation_components":[
+		{
+
+			"make_data_file":{
+				"transformation_class":"data_file",
+				"file_name":"DataFile.py",
+				"dependency":[
+					"make_stoichiometric_matrix"
+				]
+			}
+		},
+		{
+			"make_stoichiometric_matrix":{
+				"transformation_class":"stoichiometric_matrix",
+				"file_name":"STMatrix.dat"
+			}
+		},
+		{
+			"make_balance_equations":{
+				"transformation_class":"balance_equations",
+				"file_name":"BalanceEquations.py",
+				"dependency":[
+					"make_stoichiometric_matrix",
+					"make_kinetics_equations",
+					"make_input_equations"
+				]
+			}
+		},
+		{
+			"make_solve_balance_equations":{
+				"transformation_class":"solve_balance_equations",
+				"file_name":"SolveBalanceEquations.py",
+				"dependency":[
+					"make_balance_equations",
+					"make_data_file"
+				]
+			}
+		}
+	],
+
+	"transformation_type":{
+
+		"transformation_input_type":"VLFF",
+		"transformation_input_url":"/Users/jeffreyvarner/python_work/PyHenshin/test/small_circuit_test_python/Network.dat",
+		"transformation_output_url":"/Users/jeffreyvarner/python_work/PyHenshin/test/small_circuit_test_python/",
+		"transformation_output_language_type":"Python",
+		"transformation_model_class":"MA"
+	}
+}

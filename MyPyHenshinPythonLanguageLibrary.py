@@ -1,3 +1,5 @@
+from MyPyHenshinOctaveMLanguageLibrary import MyPyHenshinOctaveMLanguageLibrary
+
 class MyPyHenshinPythonLanguageLibrary(object):
 
     def __init__(self):
@@ -6,6 +8,12 @@ class MyPyHenshinPythonLanguageLibrary(object):
     def __del__(self):
         pass
 
+
+    def buildStoichiometricMatrixWithModelTree(self,transformation_name, transformation_tree, model_tree):
+
+        language_library = MyPyHenshinOctaveMLanguageLibrary()
+        buffer = language_library.buildStoichiometricMatrixWithModelTree(transformation_name, transformation_tree, model_tree)
+        return buffer
 
     def buildMassActionBalanceEquationsForPythonWithModelTree(self, transformation_name, transformation_tree, model_tree):
 
@@ -36,6 +44,10 @@ class MyPyHenshinPythonLanguageLibrary(object):
             buffer += '\n'
             buffer += 'def calculateInputs(x,t,PROBLEM_DICTIONARY):\n'
             buffer += '\n'
+            buffer += '\t# Default input is zero vector. Change for your problem.\n'
+            buffer += '\tnumber_of_states = len(x)\n'
+            buffer += '\tuV = np.zeros((number_of_states,1))\n'
+            buffer += '\treturn uV\n'
             buffer += '\n'
             buffer += 'def '+function_name+'(x,t,PROBLEM_DICTIONARY):\n'
             buffer += '\n'
@@ -57,11 +69,11 @@ class MyPyHenshinPythonLanguageLibrary(object):
 
 
     def buildMassActionSolveBalanceEquationsForPythonWithModelTree(self,transformation_name,transformation_tree,model_tree):
-        pass
+        return "Impl will go here"
 
 
     def buildMassActionDataFileForPythonWithModelTree(self,transformation_name,transformation_tree,model_tree):
-        pass
+        return "Impl will go here"
 
 
 
