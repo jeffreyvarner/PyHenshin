@@ -41,6 +41,31 @@ class MyPyHenshinPythonLanguageLibrary(object):
             buffer += '\n'
             buffer += 'def calculateKinetics(x,t,PROBLEM_DICTIONARY):\n'
             buffer += '\n'
+
+            # Write the kinetics -
+            interaction_name_list = model_tree.myInteractionNameList
+            reaction_counter = 0
+            for local_reaction_name in interaction_name_list:
+
+                buffer += '\trV['+str(reaction_counter)+',0] = kV('+str(reaction_counter)+',0)'
+
+                # look up reaction_stoichiometric_map
+                reaction_stoichiometric_map = model_tree.myDictionaryOfInteractionModels[local_reaction_name]
+                for (local_species_symbol,stcoeff) in reaction_stoichiometric_map.iteritems():
+
+                    if not local_species_symbol == 'raw_interaction_string' and not local_species_symbol == '[]':
+                        if float(stcoeff)<0.0:
+
+                            if float(stcoeff) == -1.0:
+                                buffer += '*('+local_species_symbol+')'
+                            else:
+                                buffer += '*pow('+local_species_symbol+','+str(-1*stcoeff)+')'
+
+                buffer += ';\n'
+                reaction_counter += 1
+            buffer += '\treturn rV\n'
+
+
             buffer += '\n'
             buffer += 'def calculateInputs(x,t,PROBLEM_DICTIONARY):\n'
             buffer += '\n'
@@ -57,7 +82,11 @@ class MyPyHenshinPythonLanguageLibrary(object):
             buffer += '\t# Call the inputs function - \n'
             buffer += '\tuV = calculateInputs(x,t,PROBLEM_DICTIONARY)\n'
             buffer += '\n'
-            buffer += '\t# Call the input function - \n'
+            buffer += '\t# Calculate the balance equations - \n'
+            buffer += '\tSTMATRIX = PROBLEM_DICTIONARY[\'stoichiometric_matrix\']\n'
+            buffer += '\tdxdt = STMATRIX*rV+uV\n'
+            buffer += '\n'
+            buffer += '\t# return dxdt to the caller - \n'
             buffer += '\treturn dxdt\n'
 
             return buffer
