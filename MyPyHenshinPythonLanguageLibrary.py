@@ -42,12 +42,32 @@ class MyPyHenshinPythonLanguageLibrary(object):
             buffer += 'def calculateKinetics(x,t,PROBLEM_DICTIONARY):\n'
             buffer += '\n'
 
+
+            # Grab the rate constant vector -
+            buffer += '\t# Get the kinetics vector from the problem_dictionary \n'
+            buffer += '\tkV = PROBLEM_DICTIONARY[\'rate_constant_vector\']\n'
+            buffer += '\tnumber_of_rates = PROBLEM_DICTIONARY[\'number_of_rates\']\n'
+            buffer += '\n'
+
+            buffer += '\t# Alias the species - \n'
+            species_symbol_list = model_tree.mySpeciesSymbolList
+            species_counter = 0
+            for species_symbol in species_symbol_list:
+
+                if not species_symbol == '[]':
+                    buffer += '\t'+species_symbol + ' = x['+str(species_counter)+'];\n'
+                    species_counter += 1
+
+            buffer += '\n'
+            buffer += '\t# Calculate the kinetics - \n'
+            buffer += '\trV = np.zeros((number_of_rates,1))\n'
+
             # Write the kinetics -
             interaction_name_list = model_tree.myInteractionNameList
             reaction_counter = 0
             for local_reaction_name in interaction_name_list:
 
-                buffer += '\trV['+str(reaction_counter)+',0] = kV('+str(reaction_counter)+',0)'
+                buffer += '\trV['+str(reaction_counter)+',0] = kV['+str(reaction_counter)+',0]'
 
                 # look up reaction_stoichiometric_map
                 reaction_stoichiometric_map = model_tree.myDictionaryOfInteractionModels[local_reaction_name]
@@ -63,6 +83,8 @@ class MyPyHenshinPythonLanguageLibrary(object):
 
                 buffer += ';\n'
                 reaction_counter += 1
+
+            buffer += '\n'
             buffer += '\treturn rV\n'
 
 
