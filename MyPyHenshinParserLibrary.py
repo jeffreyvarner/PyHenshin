@@ -30,7 +30,7 @@ class MyPyHenshinVLFFParser(MyPyHenshinAbstractParser):
 
             # if not zero, or a comment -
             if not len(line) == 0:
-                if not line.startswith('#'):
+                if not line.startswith('#') and not line.startswith('//'):
 
                     fragment_array = line.split(",")
                     number_of_fragments = len(fragment_array)

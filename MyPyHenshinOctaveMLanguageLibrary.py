@@ -59,6 +59,204 @@ class MyPyHenshinOctaveMLanguageLibrary(object):
 
         return "Monkey"
 
+
+    def buildFBAFluxBoundsFileForOctaveMWithModelTree(self,transformation_name,transformation_tree,model_tree):
+
+        # First thing, we need to look up the specific block that is associated with this transformation
+        component_dictionary = None
+        transformation_component_array = transformation_tree['transformation_component_array']
+        for transformation_dictionary in transformation_component_array:
+            for key_value in transformation_dictionary:
+                if key_value == transformation_name:
+                    component_dictionary = transformation_dictionary[key_value]
+                    break
+
+        # We should have the component dictionary - execute the code generation logic
+        if component_dictionary is not None:
+
+            # program buffer -
+            buffer = ''
+
+            reaction_name_list = model_tree.myInteractionNamelList
+            reaction_count = len(reaction_name_list)
+            for reaction_index in range(0,reaction_count):
+                buffer += '0\tinf\n'
+
+            return buffer
+        else:
+            raise Exception("Error while executing "+str(__name__)+". Missing transformation component dictionary?")
+
+        return "Monkey"
+
+
+    def buildFBADebugFluxFileForOctaveMWithModelTree(selfself,transformation_name,transformation_tree,model_tree):
+
+         # First thing, we need to look up the specific block that is associated with this transformation
+        component_dictionary = None
+        transformation_component_array = transformation_tree['transformation_component_array']
+        for transformation_dictionary in transformation_component_array:
+            for key_value in transformation_dictionary:
+                if key_value == transformation_name:
+                    component_dictionary = transformation_dictionary[key_value]
+                    break
+
+        # We should have the component dictionary - execute the code generation logic
+        if component_dictionary is not None:
+
+            # program buffer -
+            buffer = ''
+
+            # Get the list of raw reaction string -
+            counter = 1
+            raw_reaction_string_list = model_tree.myListOfRawReactionStrings
+            for reaction_string in raw_reaction_string_list:
+                buffer += str(counter)+'\t'+reaction_string
+                buffer += '\n'
+                counter += 1
+
+            return buffer
+        else:
+            raise Exception("Error while executing "+str(__name__)+". Missing transformation component dictionary?")
+
+        return "Monkey"
+
+
+    def buildFBADataFileForOctaveMWithModelTree(self,transformation_name,transformation_tree,model_tree):
+
+        # First thing, we need to look up the specific block that is associated with this transformation
+        component_dictionary = None
+        transformation_component_array = transformation_tree['transformation_component_array']
+        for transformation_dictionary in transformation_component_array:
+            for key_value in transformation_dictionary:
+                if key_value == transformation_name:
+                    component_dictionary = transformation_dictionary[key_value]
+                    break
+
+        # Do we have a dependency?
+        dependecy_list = component_dictionary['dependency']
+        dependency_dictionary = dict()
+        for dependency_key in dependecy_list:
+
+            # Item index -
+            for transformation_component in transformation_component_array:
+
+                if dependency_key in transformation_component:
+                    dependency_dictionary[dependency_key] = transformation_component[dependency_key]['file_name']
+
+        # We should have the component dictionary - execute the code generation logic
+        if component_dictionary is not None:
+
+            # program buffer -
+            buffer = ''
+
+            # Get the file name (we need this to get the function name -
+            filename = component_dictionary['file_name']
+
+            # Get the function name -
+            function_name = filename.split('.')[0]
+
+            buffer += "function DF = "+function_name+"(TSTART,TSTOP,Ts,INDEX)\n"
+            buffer += '\n'
+            buffer += '% Load the stoichiometric matrix and flux bounds array - \n'
+
+            # Do we have a make_stoichiometric_matrix key?
+            if 'make_stoichiometric_matrix' in dependency_dictionary:
+                stoichiometric_matrix_filename = dependency_dictionary['make_stoichiometric_matrix']
+                buffer += 'stoichiometric_matrix = load(\''
+                buffer += stoichiometric_matrix_filename
+                buffer += '\');\n'
+            else:
+                buffer += 'stoichiometric_matrix = load(\'STMatrix.dat\');\n'
+
+
+            # Do we have the flux bound key?
+            if 'make_flux_bounds_file' in dependency_dictionary:
+                flux_bounds_filename = dependency_dictionary['make_flux_bounds_file']
+                buffer += 'flux_bounds_array = load(\''
+                buffer += flux_bounds_filename
+                buffer += '\');\n'
+            else:
+                buffer += 'flux_bounds_array = load(\'FB.dat\');\n'
+
+
+            buffer += '[number_of_species,number_of_reactions] = size(stoichiometric_matrix);\n'
+            buffer += '\n'
+
+            # Build the free species list -
+            # We should *not* be doing this here ....
+            path_to_extracellular_species_list = transformation_tree['transformation_extracellular_species_url']
+            input_text_file = open(path_to_extracellular_species_list, "r")
+            extracellular_species_list = []
+            for line_raw in input_text_file:
+                extracellular_species_list.append(line_raw.rstrip('\n'))
+
+            buffer += '% Setup the free metabolite array - \n'
+            buffer += 'IDX_FREE_METABOLITES = [\n'
+
+            counter = 1
+            model_species_list = model_tree.mySpeciesSymbolList
+            for extracellular_species in extracellular_species_list:
+
+                # Lookup the index of this species -
+                extracellular_species_index = model_species_list.index(extracellular_species)+1
+                buffer += '\t'+str(extracellular_species_index)
+                buffer += '\t'+str(counter)
+                buffer += '\t;\t% '+str(counter)+' '+extracellular_species
+                buffer += '\n'
+                counter += 1
+
+            buffer += '];\n'
+
+            buffer += '\n'
+            buffer += '% Split the stoichiometric matrix - \n'
+            buffer += 'IDX_BALANCED_METABOLITES = setdiff(1:number_of_species,IDX_FREE_METABOLITES(:,1));\n'
+            buffer += 'N_IDX_BALANCED_METABOLITES = length(IDX_BALANCED_METABOLITES);\n'
+            buffer += '\n'
+
+            # Make the species bound array -
+            buffer += '% Setup the bounds on species - \n'
+            buffer += 'BASE_BOUND = 1;\n'
+            buffer += 'SPECIES_BOUND = [\n'
+
+            counter = 1
+            for extracellular_species in extracellular_species_list:
+
+                # Lookup the index of this species -
+                extracellular_species_index = model_species_list.index(extracellular_species)+1
+                buffer += '\t'+str(extracellular_species_index)
+                buffer += '\t0\tBASE_BOUND\t;\t% '+str(counter)+' '+extracellular_species
+                buffer += '\n'
+                counter += 1
+
+            buffer += '];\n'
+            buffer += '\n'
+
+            # Split the stoichiometric matrix -
+            buffer += '% Split the stochiometrix matrix - \n'
+            buffer += 'S	=	stoichiometric_matrix(IDX_BALANCED_METABOLITES,:);\n'
+            buffer += 'SDB	=	stoichiometric_matrix(SPECIES_BOUND(:,1),:);\n'
+
+
+            buffer += '\n'
+            buffer += '% == DO NOT EDIT BELOW THIS LINE ================================== \n'
+            buffer += 'DF.STOICHIOMETRIC_MATRIX = stoichiometric_matrix;\n'
+            buffer += 'DF.FLUX_BOUNDS = flux_bounds_array;\n'
+            buffer += 'DF.SPECIES_BOUND_ARRAY = SPECIES_BOUND;\n'
+            buffer += 'DF.SPECIES_BOUNDS_INDEX = IDX_FREE_METABOLITES;\n'
+            buffer += 'DF.BALANCED_MATRIX = S;\n'
+            buffer += 'DF.SPECIES_CONSTRAINTS = SDB;\n'
+            buffer += 'DF.NUMBER_OF_REACTIONS = number_of_reactions;\n'
+            buffer += 'DF.NUMBER_OF_STATES = number_of_species;\n'
+            buffer += '% ================================================================= \n'
+            buffer += 'return;\n'
+
+            return buffer
+        else:
+
+            raise Exception("Error while executing "+str(__name__)+". Missing transformation component dictionary?")
+
+        return "Monkey"
+
     def buildMassActionDataFileForOctaveMWithModelTree(self,transformation_name,transformation_tree,model_tree):
 
         # First thing, we need to look up the specific block that is associated with this transformation

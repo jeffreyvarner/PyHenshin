@@ -7,12 +7,14 @@ class MyPyHenshinIntermediateModelObject(object):
         self._mySpeciesSymbolList = None
         self._myDictionaryOfSpeciesModels = None
         self._myDictionaryOfInteractionModels = None
+        self._myListOfRawReactionStrings = []
 
     def __del__(self):
         self._myInteractionNameList = None
         self._mySpeciesSymbolList = None
         self._myDictionaryOfSpeciesModels = None
         self._myDictionaryOfInteractionModels = None
+        self._myListOfRawReactionStrings = None
 
     def __extractSpeciesFromVLVFFReactionString(self, reaction_string, direction_factor):
 
@@ -92,6 +94,7 @@ class MyPyHenshinIntermediateModelObject(object):
             # build reaction model -
             reaction_model = dict(reactant_stoichiometric_dictionary.items()+product_stoichiometric_dictionary.items())
             reaction_model['raw_interaction_string'] = reactant_string+'-->'+product_string
+            self._myListOfRawReactionStrings.append(reactant_string+'-->'+product_string)
             self.addInteractionToInteractionDictionary(reaction_name, reaction_model)
 
             reactant_model = {}
@@ -143,6 +146,15 @@ class MyPyHenshinIntermediateModelObject(object):
                 self._myDictionaryOfSpeciesModels[species_key] = species_model
 
 
+
+    @property
+    def myListOfRawReactionStrings(self):
+        return self._myListOfRawReactionStrings
+
+
+    @myListOfRawReactionStrings.setter
+    def myListOfRawReactionStrings(self,interaction_list):
+        self._myListOfRawReactionStrings = interaction_list
 
     @property
     def myInteractionNamelList(self):

@@ -47,7 +47,7 @@ def main(argv):
         model_transformation_manager = MyPyHenshinMAModelTransformation(data)
 
     elif model_type_flag == "FBA":
-        model_transformation_manager = MyPyHenshinFBAModelTransformation()
+        model_transformation_manager = MyPyHenshinFBAModelTransformation(data)
 
     elif model_type_flag == "HCFL":
         model_transformation_manager = MyPyHenshinHCFLModelTransformation()
@@ -66,16 +66,12 @@ def main(argv):
     input_file_url = transformation_dictionary['transformation_input_url']
     intermediate_model_tree = model_input_parser.buildModelTreeFromInputURL(input_file_url)
 
-    pdb.set_trace()
-
     # hand the model tree to the transformation manager -
     model_componenent_dictionary = model_transformation_manager.executeTransformationUsingIntermediateTree(transformation_dictionary,
                                                                                                            intermediate_model_tree,
                                                                                                            input_language_flag,
                                                                                                            model_type_flag,
                                                                                                            output_language_type_flag)
-
-    pdb.set_trace()
 
     # write the model components to disk -
     path_to_model_components = args_list.transformation_output_path
