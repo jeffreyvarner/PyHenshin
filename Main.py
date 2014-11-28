@@ -49,6 +49,9 @@ def main(argv):
     elif model_type_flag == "FBA":
         model_transformation_manager = MyPyHenshinFBAModelTransformation(data)
 
+    elif model_type_flag == 'CELL_FREE':
+        model_transformation_manager = MyPyHenshinCellFreeModelTransformation(data)
+
     elif model_type_flag == "HCFL":
         model_transformation_manager = MyPyHenshinHCFLModelTransformation()
 
