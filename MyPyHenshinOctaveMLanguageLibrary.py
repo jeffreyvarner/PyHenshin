@@ -1,6 +1,7 @@
 import pdb
 import numpy
 import random
+from MyPyHenshinParserLibrary import *
 
 
 class MyPyHenshinOctaveMLanguageLibrary(object):
@@ -61,6 +62,82 @@ class MyPyHenshinOctaveMLanguageLibrary(object):
         return "Monkey"
 
     # FLUX BALANCE ANALYSIS METHODS --------------------------------------------------------------------------------- #
+    def buildFBAControlEquationsForOctaveMWithModelTree(self, transformation_name, transformation_tree, model_tree):
+
+        # First thing, we need to look up the specific block that is associated with this transformation
+        component_dictionary = None
+        transformation_component_array = transformation_tree['transformation_component_array']
+        for transformation_dictionary in transformation_component_array:
+            for key_value in transformation_dictionary:
+                if key_value == transformation_name:
+                    component_dictionary = transformation_dictionary[key_value]
+                    break
+
+        # Do we have a dependency?
+        if 'dependency' in component_dictionary:
+            dependecy_list = component_dictionary['dependency']
+            dependency_dictionary = dict()
+            for dependency_key in dependecy_list:
+
+                # Item index -
+                for transformation_component in transformation_component_array:
+
+                    if dependency_key in transformation_component:
+                        dependency_dictionary[dependency_key] = transformation_component[dependency_key]['file_name']
+
+
+        # We should have the component dictionary - execute the code generation logic
+        if component_dictionary is not None:
+
+            # Initialize an empty buffer ...
+            buffer = ''
+
+            # Control file -
+            if 'transformation_control_file_url' in transformation_tree:
+
+                 # Get the control file url -
+                path_to_control_file = transformation_tree['transformation_control_file_url']
+
+                # Load the parser -
+                parser = MyPyHenshinControlListParser()
+
+                # Parse the control file -
+                control_data_structure = parser.buildFBAControlFunctionListFromInputURL(path_to_control_file)
+
+                # Process the control data structure -
+                for control_data in control_data_structure:
+
+                    # Extract data -
+                    type_flag = control_data[0]
+                    source_array = control_data[1]
+                    target_array = control_data[2]
+
+                    if type_flag == 'activates':
+
+                        print('activates')
+
+                    elif type_flag == 'inhibits':
+
+                        print('inhibits')
+
+                    elif type_flag == 'induces':
+
+                        print('induces')
+
+                    elif type_flag == 'represses':
+
+                        print('represses')
+
+            # return the filled buffer -
+            return buffer
+
+        else:
+
+            raise Exception("Error while executing " + str(__name__) + ". Missing transformation component dictionary?")
+
+        return "Monkey"
+
+
     def buildFBAFluxBoundsFileForOctaveMWithModelTree(self, transformation_name, transformation_tree, model_tree):
 
         # First thing, we need to look up the specific block that is associated with this transformation
@@ -181,12 +258,18 @@ class MyPyHenshinOctaveMLanguageLibrary(object):
             buffer += '\n'
 
             # Build the free species list -
-            # We should *not* be doing this here ....
-            path_to_extracellular_species_list = transformation_tree['transformation_extracellular_species_url']
-            input_text_file = open(path_to_extracellular_species_list, "r")
             extracellular_species_list = []
-            for line_raw in input_text_file:
-                extracellular_species_list.append(line_raw.rstrip('\n'))
+            if 'transformation_extracellular_species_url' in transformation_tree:
+
+                # Get the extracellular url -
+                path_to_extracellular_species_list = transformation_tree['transformation_extracellular_species_url']
+
+                # Build the parser -
+                input_file_parser = MyPyHenshinSpeciesListParser()
+
+                # Load the file -
+                extracellular_species_list = input_file_parser.buildSpeciesListFromInputURL(path_to_extracellular_species_list)
+
 
             buffer += '% Setup the free metabolite array - \n'
             buffer += 'IDX_FREE_METABOLITES = [\n'
@@ -254,6 +337,53 @@ class MyPyHenshinOctaveMLanguageLibrary(object):
     # ----------------------------------------------------------------------------------------------------------------#
 
     # CELL FREE METHODS ----------------------------------------------------------------------------------------------#
+    def buildCellFreeControlEquationsForOctaveMWithModelTree(self, transformation_name, transformation_tree, model_tree):
+
+        # First thing, we need to look up the specific block that is associated with this transformation
+        component_dictionary = None
+        transformation_component_array = transformation_tree['transformation_component_array']
+        for transformation_dictionary in transformation_component_array:
+            for key_value in transformation_dictionary:
+                if key_value == transformation_name:
+                    component_dictionary = transformation_dictionary[key_value]
+                    break
+
+        # Do we have a dependency?
+        dependecy_list = component_dictionary['dependency']
+        dependency_dictionary = dict()
+        for dependency_key in dependecy_list:
+
+            # Item index -
+            for transformation_component in transformation_component_array:
+
+                if dependency_key in transformation_component:
+                    dependency_dictionary[dependency_key] = transformation_component[dependency_key]['file_name']
+
+        # We should have the component dictionary - execute the code generation logic
+        if component_dictionary is not None:
+
+            # Initialize an empty buffer ...
+            buffer = ''
+
+            # Control file -
+            if 'control_file_url' in transformation_tree:
+
+                 # Get the control file url -
+                path_to_control_file = transformation_tree['control_file_url']
+
+                # Load the parser -
+                parser = MyPyHenshinControlListParser()
+
+
+            # return the filled buffer -
+            return buffer
+
+        else:
+
+            raise Exception("Error while executing " + str(__name__) + ". Missing transformation component dictionary?")
+
+        return "Monkey"
+
     def buildCellFreeKineticsEquationsForOctaveMWithModelTree(self, transformation_name, transformation_tree, model_tree):
 
         # First thing, we need to look up the specific block that is associated with this transformation
@@ -281,6 +411,7 @@ class MyPyHenshinOctaveMLanguageLibrary(object):
 
             # Initialize an empty buffer ...
             buffer = ''
+
 
 
             # return the filled buffer -
@@ -375,7 +506,7 @@ class MyPyHenshinOctaveMLanguageLibrary(object):
             buffer += '% Update the rate vector -\n'
             buffer += 'rV = rV*vV;\n'
             buffer += '\n'
-            
+
             # Check to see if we have a kinetics dependency -
             buffer += '% Calculate the inputs -\n'
             if 'make_inputs' in dependency_dictionary:

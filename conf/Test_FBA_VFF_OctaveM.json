@@ -1,7 +1,6 @@
 {
 	"list_of_transformation_components":[
 		{
-
 			"make_data_file":{
 				"transformation_class":"data_file",
 				"file_name":"BSubDataFile.m",
@@ -28,6 +27,12 @@
 		        "transformation_class":"debug_flux_file",
 		        "file_name":"BSubDebugFluxFile.txt"
 		    }
+		},
+		{
+		    "make_control_file":{
+		        "transformation_class":"control_file",
+		        "file_name":"Control.m"
+		    }
 		}
 	],
 
@@ -37,6 +42,7 @@
 		"transformation_input_url":"/Users/jeffreyvarner/python_work/PyHenshin/test/fba_example_octave_m/Bsub_Reactions.dat",
 		"transformation_extracellular_species_url":"/Users/jeffreyvarner/python_work/PyHenshin/test/fba_example_octave_m/Extracellular.dat",
 		"transformation_output_url":"/Users/jeffreyvarner/python_work/PyHenshin/test/fba_example_octave_m/",
+		"transformation_control_file_url":"/Users/jeffreyvarner/python_work/PyHenshin/test/fba_example_octave_m/Control.dat",
 		"transformation_output_language_type":"Octave-M",
 		"transformation_model_class":"FBA"
 	}
