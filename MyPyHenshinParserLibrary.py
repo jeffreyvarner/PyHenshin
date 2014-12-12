@@ -14,7 +14,10 @@ class MyPyHenshinSBMLParser(MyPyHenshinAbstractParser):
 
 class MyPyHenshinControlListParser(MyPyHenshinAbstractParser):
 
-    def buildFBAControlFunctionListFromInputURL(self,path_to_input_file):
+    def buildFBAControlFunctionListFromInputURL(self,path_to_input_file,model_tree):
+
+
+        list_of_reaction_names = model_tree.myInteractionNameList
 
         input_text_file = open(path_to_input_file, "r")
         data_array = []

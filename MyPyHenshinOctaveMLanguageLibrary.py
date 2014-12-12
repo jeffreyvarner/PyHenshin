@@ -413,6 +413,32 @@ class MyPyHenshinOctaveMLanguageLibrary(object):
             buffer = ''
 
 
+            # Check to see if we have an order file -
+            extracellular_species_list = []
+            if 'transformation_extracellular_species_url' in transformation_tree:
+
+                # Get the extracellular url -
+                path_to_extracellular_species_list = transformation_tree['transformation_extracellular_species_url']
+
+                # Build the parser -
+                input_file_parser = MyPyHenshinSpeciesListParser()
+
+                # Load the file -
+                extracellular_species_list = input_file_parser.buildSpeciesListFromInputURL(path_to_extracellular_species_list)
+
+
+            # Reorder the species list -
+            species_symbol_list = model_tree.mySpeciesSymbolList
+            reordered_species_list = []
+            for species_symbol in species_symbol_list:
+                if not species_symbol == '[]':
+                    if not species_symbol in extracellular_species_list:
+                        reordered_species_list.append(species_symbol)
+
+            for extracellular_species_symbol in extracellular_species_list:
+                if not extracellular_species_symbol == '[]':
+                    reordered_species_list.append(extracellular_species_symbol)
+
 
             # return the filled buffer -
             return buffer
@@ -602,13 +628,45 @@ class MyPyHenshinOctaveMLanguageLibrary(object):
             buffer += '% Initial condition vector - \n'
             buffer += 'ICV = [\n'
 
-            # Populate the list of ICs w/0's -
+            # Check to see if we have an order file -
+            extracellular_species_list = []
+            if 'transformation_extracellular_species_url' in transformation_tree:
+
+                # Get the extracellular url -
+                path_to_extracellular_species_list = transformation_tree['transformation_extracellular_species_url']
+
+                # Build the parser -
+                input_file_parser = MyPyHenshinSpeciesListParser()
+
+                # Load the file -
+                extracellular_species_list = input_file_parser.buildSpeciesListFromInputURL(path_to_extracellular_species_list)
+
+
+            # Reorder the species list -
             species_symbol_list = model_tree.mySpeciesSymbolList
-            species_counter = 1
+            reordered_species_list = []
             for species_symbol in species_symbol_list:
+                if not species_symbol == '[]':
+                    if not species_symbol in extracellular_species_list:
+                        reordered_species_list.append(species_symbol)
+
+            for extracellular_species_symbol in extracellular_species_list:
+                if not extracellular_species_symbol == '[]':
+                    reordered_species_list.append(extracellular_species_symbol)
+
+            # Populate the list of ICs w/0's -
+            reaction_name_list = model_tree.myInteractionNameList
+            species_counter = 1
+            for species_symbol in reordered_species_list:
 
                 if not species_symbol == '[]':
                     buffer += '\t0.0;\t% ' + str(species_counter) + ' ' + species_symbol + '\n'
+                    species_counter += 1
+
+            for reaction_symbol in reaction_name_list:
+
+                if not species_symbol == '[]':
+                    buffer += '\t1.0;\t% ' + str(species_counter) + ' E_' + reaction_symbol + '\n'
                     species_counter += 1
 
             buffer += '];\n'

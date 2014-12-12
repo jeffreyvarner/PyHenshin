@@ -160,9 +160,8 @@ class MyPyHenshinIntermediateModelObject(object):
     def myInteractionNamelList(self):
         return self._myInteractionNameList
 
-
     @myInteractionNamelList.setter
-    def myInteractionNameList(self,interaction_name_list):
+    def myInteractionNameList(self, interaction_name_list):
         self._myInteractionNameList = interaction_name_list
 
     @property
