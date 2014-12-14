@@ -23,6 +23,12 @@
 		    }
 		},
 		{
+			"make_kinetics_equations":{
+				"transformation_class":"kinetics_equations",
+				"file_name":"Kinetics.m"
+			}
+		},
+		{
 		    "make_debug_flux_file":{
 		        "transformation_class":"debug_flux_file",
 		        "file_name":"DebugFluxFile.txt"

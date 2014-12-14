@@ -337,6 +337,31 @@ class MyPyHenshinOctaveMLanguageLibrary(object):
     # ----------------------------------------------------------------------------------------------------------------#
 
     # CELL FREE METHODS ----------------------------------------------------------------------------------------------#
+    def extractReactantsFromReactionString(self, reaction_string, direction_factor):
+
+        # Split around the +
+        species_list = reaction_string.split('+')
+        new_species_list = []
+        stoichiometry_dictionary = {}
+        for raw_species in species_list:
+            if '*' in raw_species:
+
+                species_symbol = raw_species.split('*')[1]
+                new_species_list.append(species_symbol)
+
+                # grab the stoichoimetry -
+                stoichiometry_dictionary[species_symbol] = direction_factor*float(raw_species.split('*')[0])
+
+            else:
+                new_species_list.append(raw_species)
+
+                # grab the stoichoimetry -
+                stoichiometry_dictionary[raw_species] = direction_factor
+
+
+        return (new_species_list,stoichiometry_dictionary)
+
+
     def buildCellFreeControlEquationsForOctaveMWithModelTree(self, transformation_name, transformation_tree, model_tree):
 
         # First thing, we need to look up the specific block that is associated with this transformation
@@ -396,15 +421,16 @@ class MyPyHenshinOctaveMLanguageLibrary(object):
                     break
 
         # Do we have a dependency?
-        dependecy_list = component_dictionary['dependency']
         dependency_dictionary = dict()
-        for dependency_key in dependecy_list:
+        if 'dependency' in component_dictionary:
+            dependecy_list = component_dictionary['dependency']
+            for dependency_key in dependecy_list:
 
-            # Item index -
-            for transformation_component in transformation_component_array:
+                # Item index -
+                for transformation_component in transformation_component_array:
 
-                if dependency_key in transformation_component:
-                    dependency_dictionary[dependency_key] = transformation_component[dependency_key]['file_name']
+                    if dependency_key in transformation_component:
+                        dependency_dictionary[dependency_key] = transformation_component[dependency_key]['file_name']
 
         # We should have the component dictionary - execute the code generation logic
         if component_dictionary is not None:
@@ -439,6 +465,62 @@ class MyPyHenshinOctaveMLanguageLibrary(object):
                 if not extracellular_species_symbol == '[]':
                     reordered_species_list.append(extracellular_species_symbol)
 
+            # Get the file name (we need this to get the function name -
+            filename = component_dictionary['file_name']
+
+            # Get the function name -
+            function_name = filename.split('.')[0]
+
+             # Fill the buffer ...
+            buffer += 'function rV = ' + function_name + '(x,t,DF)\n'
+            buffer += '\n'
+            buffer += '\t% Grab the parameter vector from the data file struct -\n'
+            buffer += '\tk = DF.KINETIC_PARAMETER_VECTOR;\n'
+            buffer += '\n'
+
+            buffer += '\t% Alias the species -\n'
+            counter = 1
+            for species_symbol in reordered_species_list:
+                buffer += '\t'+species_symbol+' = x('+str(counter)+',1);\n'
+                counter += 1
+
+            reaction_name_list = model_tree.myInteractionNameList
+            for reaction_symbol in reaction_name_list:
+
+                if not species_symbol == '[]':
+                    buffer += '\tE_' + reaction_symbol+' = x('+str(counter)+',1);\n'
+                    counter += 1
+
+
+
+
+
+
+            buffer += '\n'
+            buffer += '\t% Reaction functions -\n'
+            buffer += '\trV = zeros('+str(len(reaction_name_list))+',1);\n'
+            model_dictionary = model_tree.myDictionaryOfInteractionModels
+            reaction_counter = 1
+            parameter_counter = 1
+            for reaction_symbol in reaction_name_list:
+
+                interaction_string = model_dictionary[reaction_symbol]['reactant_string']
+                print(interaction_string)
+                (new_species_list,stoichiometry_dictionary) = self.extractReactantsFromReactionString(interaction_string, -1.0)
+
+                buffer += '\trV('+str(reaction_counter)+',1) = k('+str(parameter_counter)+',1)*E_'+str(reaction_symbol)
+                parameter_counter += 1
+
+                for reactant_species_symbol in new_species_list:
+                    buffer += '*('+reactant_species_symbol+'/(k('+str(parameter_counter)+',1)+'+reactant_species_symbol+'))'
+                    parameter_counter += 1
+
+                buffer += ';\n'
+
+                reaction_counter += 1
+
+
+            buffer += 'return\n'
 
             # return the filled buffer -
             return buffer

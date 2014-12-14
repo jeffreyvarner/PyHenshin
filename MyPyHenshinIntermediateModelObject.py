@@ -94,6 +94,7 @@ class MyPyHenshinIntermediateModelObject(object):
             # build reaction model -
             reaction_model = dict(reactant_stoichiometric_dictionary.items()+product_stoichiometric_dictionary.items())
             reaction_model['raw_interaction_string'] = reactant_string+'-->'+product_string
+            reaction_model['reactant_string'] = reactant_string
             self._myListOfRawReactionStrings.append(reactant_string+'-->'+product_string)
             self.addInteractionToInteractionDictionary(reaction_name, reaction_model)
 
