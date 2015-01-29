@@ -1,0 +1,150 @@
+// Test VFF for spatial FBA study
+// J.Varner, 1-14-15
+
+// Subvolume 1 (1,1)
+RXN_11,A1,B1,-inf,inf;
+RXN_21,A1,C1,0,inf;
+RXN_31,C1,B1,0,inf;
+
+// Subvolume 2 
+RXN_12,A2,B2,-inf,inf;
+RXN_22,A2,C2,0,inf;
+RXN_32,C2,B2,0,inf;
+
+// Subvolume 3 
+RXN_13,A3,B3,-inf,inf;
+RXN_23,A3,C3,0,inf;
+RXN_33,C3,B3,0,inf;
+
+// Subvolume 4
+RXN_14,A4,B4,-inf,inf;
+RXN_24,A4,C4,0,inf;
+RXN_34,C4,B4,0,inf;
+
+// Subvolume 5
+RXN_15,A5,B5,-inf,inf;
+RXN_25,A5,C5,0,inf;
+RXN_35,C5,B5,0,inf;
+
+// Subvolume 6
+RXN_16,A6,B6,-inf,inf;
+RXN_26,A6,C6,0,inf;
+RXN_36,C6,B6,0,inf;
+
+// Subvolume 7
+RXN_17,A7,B7,-inf,inf;
+RXN_27,A7,C7,0,inf;
+RXN_37,C7,B7,0,inf;
+
+// Subvolume 8
+RXN_18,A8,B8,-inf,inf;
+RXN_28,A8,C8,0,inf;
+RXN_38,C8,B8,0,inf;
+
+// Subvolume 9 (3,3)
+RXN_19,A9,B9,-inf,inf;
+RXN_29,A9,C9,0,inf;
+RXN_39,C9,B9,0,inf;
+
+// Exchange fluxes between subcompartments -
+
+// 1-->2
+EA12,A1,A2,-inf,inf;
+EB12,B1,B2,-inf,inf;
+EC12,C1,C2,-inf,inf;
+
+// 1-->4
+EA14,A1,A4,-inf,inf;
+EB14,B1,B4,-inf,inf;
+EC14,C1,C4,-inf,inf;
+
+// 2-->3
+EA23,A2,A3,-inf,inf;
+EB23,B2,B3,-inf,inf;
+EC23,C2,C3,-inf,inf;
+
+// 2-->5
+EA25,A2,A5,-inf,inf;
+EB25,B2,B5,-inf,inf;
+EC25,C2,C5,-inf,inf;
+
+// 3-->6
+EA36,A3,A6,-inf,inf;
+EB36,B3,B6,-inf,inf;
+EC36,C3,C6,-inf,inf;
+
+// 4-->5
+EA45,A4,A5,-inf,inf;
+EB45,B4,B5,-inf,inf;
+EC45,C4,C5,-inf,inf;
+
+// 4-->7
+EA47,A4,A7,-inf,inf;
+EB47,B4,B7,-inf,inf;
+EC47,C4,C7,-inf,inf;
+
+// 5-->6
+EA56,A5,A6,-inf,inf;
+EB56,B5,B6,-inf,inf;
+EC56,C5,C6,-inf,inf;
+
+// 5-->8
+EA58,A5,A8,-inf,inf;
+EB58,B5,B8,-inf,inf;
+EC58,C5,C8,-inf,inf;
+
+// 6-->9
+EA69,A6,A9,-inf,inf;
+EB69,B6,B9,-inf,inf;
+EC69,C6,C9,-inf,inf;
+
+// 7-->8
+EA78,A7,A8,-inf,inf;
+EB78,B7,B8,-inf,inf;
+EC78,C7,C8,-inf,inf;
+
+// 8-->9
+EA89,A8,A9,-inf,inf;
+EB89,B8,B9,-inf,inf;
+EC89,C8,C9,-inf,inf;
+
+// Exchange fluxes with the environment -
+// Transport subvolume 1
+RXN_41,Ax,A1,0,inf;
+RXN_51,B1,Bx,0,inf;
+RXN_61,C1,Cx,0,inf;
+
+// Transport subvolume 2
+RXN_42,Ax,A2,0,inf;
+RXN_52,B2,Bx,0,inf;
+RXN_62,C2,Cx,0,inf;
+
+// Transport subvolume 3
+RXN_43,Ax,A3,0,inf;
+RXN_53,B3,Bx,0,inf;
+RXN_63,C3,Cx,0,inf;
+
+// Transport subvolume 4
+RXN_44,Ax,A4,0,inf;
+RXN_54,B4,Bx,0,inf;
+RXN_64,C4,Cx,0,inf;
+
+// Transport subvolume 6
+RXN_46,Ax,A6,0,inf;
+RXN_56,B6,Bx,0,inf;
+RXN_66,C6,Cx,0,inf;
+
+// Transport subvolume 7
+RXN_47,Ax,A7,0,inf;
+RXN_57,B7,Bx,0,inf;
+RXN_67,C7,Cx,0,inf;
+
+// Transport subvolume 8
+RXN_48,Ax,A8,0,inf;
+RXN_58,B8,Bx,0,inf;
+RXN_68,C8,Cx,0,inf;
+
+// Transport subvolume 9
+RXN_49,Ax,A9,0,inf;
+RXN_59,B9,Bx,0,inf;
+RXN_69,C9,Cx,0,inf;

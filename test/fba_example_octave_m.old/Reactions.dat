@@ -1,0 +1,28 @@
+// main metabolism -
+RXN_R1,A+ATP,B,0,inf;
+RXN_R2A,B,2*ATP+2*NADH+C,0,inf;
+RXN_R2B,C+2*ATP+2*NADH,B,0,inf;
+RXN_R3,B,F,0,inf;
+RXN_R4,C,G,0,inf;
+RXN_R5A,G,0.8*C+2*NADH,0,inf;
+RXN_R6,C,2*ATP+3*D,0,inf;
+RXN_R7,C+4*NADH,3*E,0,inf;
+RXN_R8A,G+ATP+2*NADH,H,0,inf;
+RXN_R8B,H,G+ATP+2*NADH,0,inf;
+RXN_RES,NADH+0.5*O2,2.6*ATP,0,inf;
+RXN_ISOPRENE,B+C+3*NADH+5*ATP,ISOPRENE,0,inf;
+
+// transport -
+RXN_TC1,X_S1,A,0,inf;
+RXN_TC2,X_S2,A,0,inf;
+RXN_TF,X_F,F,0,inf;
+RXN_TD,D,X_D,0,inf;
+RXN_TE,E,X_E,0,inf;
+RXN_TH,X_H,H,0,inf;
+RXN_TO2,X_O2,O2,0,inf;
+RXN_ISO_EXPORT,ISOPRENE,X_ISOPRENE,0,inf;
+RXN_ENZ_EXPORT,ENZYME,X_ENZYME,0,inf;
+
+// growth -
+RXN_GROWTH,C+F+H+20*ATP,X_BIOMASS,0,inf;
+RXN_ENZYME,C+F+H+10*ATP,ENZYME,0,inf;

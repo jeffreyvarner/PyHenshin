@@ -1,0 +1,19 @@
+# regulated transcription induction -
+inducer_binding,2*INDUCER+4*GENE,INDUCER_GENE,-inf,inf
+rnap_binding,RNAP+INDUCER_GENE,RNAP_INDUCER_GENE,-inf,inf
+transcription,RNAP_INDUCER_GENE,RNAP+mRNA+INDUCER,0,inf
+
+# translation -
+translation_binding,mRNA+RIBOSOME,RIBOSOME_mRNA,-inf,inf
+translation_start,RIBOSOME_mRNA,RIBOSOME_mRNA_START,0,inf
+translation_finish,RIBOSOME_mRNA_START,RIBOSOME+mRNA+PROTEIN,0,inf
+
+# repressor -
+repressor_binding,REPRESSOR+GENE,REPRESSOR_GENE,-inf,inf
+
+# production and degradation -
+rnap_production_degradation,RNAP,[],-inf,inf
+ribosome_production_degradation,RIBOSOME,[],-inf,inf
+inducer_degradation,INDUCER,[],0,inf
+mRNA_degradation,mRNA,[],0,inf
+protein_degradation,PROTEIN,[],0,inf
