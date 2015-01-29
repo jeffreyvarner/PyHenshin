@@ -1,6 +1,7 @@
 import argparse
 import sys
 import json
+import os
 import pdb
 import numpy
 from MyPyHenshinParserLibrary import *
@@ -18,7 +19,10 @@ def main(argv):
     arg_parser.add_argument('-o', '--transformation-output-path', type=str, required=True, help='Path to model output files')
     args_list = arg_parser.parse_args(argv[1:])
 
-    path_to_json_file = '/Users/jeffreyvarner/python_work/PyHenshin/conf/Rules.json'
+    my_root_directory = os.path.dirname(__file__)
+    path_to_conf_dir = os.path.join(my_root_directory, "conf")
+    path_to_json_file = os.path.join(path_to_conf_dir, "Rules.json")
+
     json_data = open(path_to_json_file)
     data = json.load(json_data)
     json_data.close()
