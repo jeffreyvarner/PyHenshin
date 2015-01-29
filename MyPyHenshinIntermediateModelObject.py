@@ -100,19 +100,22 @@ class MyPyHenshinIntermediateModelObject(object):
 
             reactant_model = {}
             for symbol in reactant_species_list:
-                local_species_model = {}
-                local_species_model['symbol'] = symbol
-                local_species_model['compartment'] = 'model'
-                reactant_model[symbol] = local_species_model
 
-                self.addSpeciesSymbolToSpeciesSymbolList(symbol)
+                if not symbol == "[]":
+                    local_species_model = {}
+                    local_species_model['symbol'] = symbol
+                    local_species_model['compartment'] = 'model'
+                    reactant_model[symbol] = local_species_model
+                    self.addSpeciesSymbolToSpeciesSymbolList(symbol)
 
             product_model = {}
             for symbol in product_species_list:
-                local_species_model = {}
-                local_species_model['symbol'] = symbol
-                local_species_model['compartment'] = 'model'
-                product_model[symbol] = local_species_model
+
+                if not symbol == "[]":
+                    local_species_model = {}
+                    local_species_model['symbol'] = symbol
+                    local_species_model['compartment'] = 'model'
+                    product_model[symbol] = local_species_model
 
                 self.addSpeciesSymbolToSpeciesSymbolList(symbol)
 

@@ -139,7 +139,7 @@ class MyPyHenshinVLFFParser(MyPyHenshinAbstractParser):
                     reaction_name_array.append(reaction_name)
 
                     # build a reaction dictionary -
-                    local_dictionary = {}
+                    local_dictionary = dict()
                     local_dictionary['reaction_name'] = reaction_name
                     local_dictionary['reaction_left_side'] = reaction_left_side
                     local_dictionary['reaction_right_side'] = reaction_right_side
