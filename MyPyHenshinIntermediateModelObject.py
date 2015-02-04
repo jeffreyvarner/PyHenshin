@@ -56,14 +56,45 @@ class MyPyHenshinIntermediateModelObject(object):
         # iterate through the list of reactions, and put into
         # the correct form -
         list_of_reactions = model_object.getListOfReactions()
+        reaction_buffer = []
         for reaction_object in list_of_reactions:
 
-            # Get the reaction name -
-            local_reaction_name = reaction_object.getName()
-            reaction_name_array.append(local_reaction_name)
+            # ok, if this reaction is reversible, then we need to change the to forward,
+            # and create the reversible reaction -
+            is_reaction_reversible_flag = reaction_object.getReversible()
+            if (is_reaction_reversible_flag == True):
+
+                # ok, the reaction is reversible, clone it, update its name, and reverse the reactants and products -
+                cloned_reaction = reaction_object.clone()
+
+                # Update the name on cloned reaction -
+                local_reaction_id = reaction_object.getId()+"_REVERSE"
+
+                cloned_reaction.setId(local_reaction_id)
+                cloned_reaction.setReversible(False)
+
+                # Add cloned reaction to buffer -
+                reaction_buffer.append(cloned_reaction)
+
+                # Lastly, flip the reversible flag on reaction_object
+                reaction_object.setReversible(True)
+
+
+        # Add cloned reactions to model -
+        for cloned_reaction in reaction_buffer:
+            return_flag = model_object.addReaction(cloned_reaction)
+            if (return_flag == LIBSBML_OPERATION_SUCCESS):
+                print("Yes!")
+
 
         # Set the list of reactions -
-        self.myInteractionNameList = reaction_name_array
+        list_of_reactions = model_object.getListOfReactions()
+        for reaction_object in list_of_reactions:
+
+            reaction_name = reaction_object.getId()+"\n"
+            print(reaction_name)
+
+        #self.myInteractionNameList = reaction_name_array
 
         pdb.set_trace()
 
