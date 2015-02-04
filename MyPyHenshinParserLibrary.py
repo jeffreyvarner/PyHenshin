@@ -2,6 +2,12 @@ import pdb
 from MyPyHenshinAbstractParser import MyPyHenshinAbstractParser
 from MyPyHenshinIntermediateModelObject import MyPyHenshinIntermediateModelObject
 
+import sys
+import time
+import os
+import os.path
+from libsbml import *
+
 class MyPyHenshinVLNLFFParser(MyPyHenshinAbstractParser):
 
     def buildModelTreeFromInputURL(self, path_to_input_file):
@@ -10,7 +16,20 @@ class MyPyHenshinVLNLFFParser(MyPyHenshinAbstractParser):
 class MyPyHenshinSBMLParser(MyPyHenshinAbstractParser):
 
     def buildModelTreeFromInputURL(self, path_to_input_file):
-        print "In SBML subclass - "+str(path_to_input_file)
+
+        # Load the SBML file -
+        reader = SBMLReader()
+        document = reader.readSBML(str(path_to_input_file))
+        model = document.getModel()
+
+         # ok, so we have the reaction dictionary, we need to convert this into the model tree
+        model_object = MyPyHenshinIntermediateModelObject()
+        model_object.initilizeMyIntermediateModelObjectWithSBMLModelObject(model)
+
+        # return -
+        return model_object
+
+
 
 class MyPyHenshinControlListParser(MyPyHenshinAbstractParser):
 

@@ -1,4 +1,5 @@
 import pdb
+from libsbml import *
 
 class MyPyHenshinIntermediateModelObject(object):
 
@@ -40,6 +41,32 @@ class MyPyHenshinIntermediateModelObject(object):
 
         return (new_species_list,stoichiometry_dictionary)
 
+    def initilizeMyIntermediateModelObjectWithSBMLModelObject(self, model_object):
+
+        # initialize -
+        reaction_dictionary = {}
+        reaction_name_array = []
+
+        # Iterate through the species list -
+        list_of_species = model_object.getListOfSpecies()
+        for species_object in list_of_species:
+            species_symbol = species_object.getId()
+            self.addSpeciesSymbolToSpeciesSymbolList(species_symbol)
+
+        # iterate through the list of reactions, and put into
+        # the correct form -
+        list_of_reactions = model_object.getListOfReactions()
+        for reaction_object in list_of_reactions:
+
+            # Get the reaction name -
+            local_reaction_name = reaction_object.getName()
+            reaction_name_array.append(local_reaction_name)
+
+        # Set the list of reactions -
+        self.myInteractionNameList = reaction_name_array
+
+        pdb.set_trace()
+
     def initilizeMyIntermediateModelObjectWithVLFFModelDictionary(self, model_dictionary):
 
         # Iterate through reactions in natural order, before we do anything split the reversible steps -
@@ -74,7 +101,6 @@ class MyPyHenshinIntermediateModelObject(object):
                 model_dictionary[reverse_name] = reverse_reaction_component_dictionary
             else:
                 local_reaction_name_array.append(reaction_name)
-
 
         # Grad this order for later -
         self.myInteractionNameList = local_reaction_name_array

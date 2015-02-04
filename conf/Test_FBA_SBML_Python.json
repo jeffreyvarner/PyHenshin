@@ -1,0 +1,19 @@
+{
+    "list_of_transformation_components": [
+      {
+        "make_stoichiometric_matrix": {
+          "transformation_class": "stoichiometric_matrix",
+          "file_name": "Network.dat"
+        }
+      }
+    ],
+
+    "transformation_type": {
+      "transformation_input_type": "SBML",
+      "transformation_input_url": "/Users/jeffreyvarner/python_work/PyHenshin/test/fba_example_python/Yeast_7.5.sbml",
+      "transformation_extracellular_species_url": "/Users/jeffreyvarner/python_work/PyHenshin/test/fba_example_python/Extracellular.dat",
+      "transformation_output_url": "/Users/jeffreyvarner/python_work/PyHenshin/test/fba_example_python/",
+      "transformation_output_language_type": "Python",
+      "transformation_model_class": "FBA"
+    }
+}
